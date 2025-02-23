@@ -33,6 +33,12 @@ const previousCard = () => {
     console.log("Previous Card");
     if (page.value > 1) {
         page.value--;
+        if (page.value < 3) {
+            disableNextButton.value = false;
+        }
+        if (page.value < 2) {
+            disablePreviousButton.value = true;
+        }
     }
 };
 
@@ -40,6 +46,12 @@ const nextCard = () => {
     console.log("Next Card");
     if (page.value < 3) {
         page.value++;
+        if (page.value > 1) {
+            disablePreviousButton.value = false;
+        }
+        if (page.value > 2) {
+            disableNextButton.value = true;
+        }
     }
 };
 </script>
@@ -76,17 +88,17 @@ const nextCard = () => {
                 {{ C02 }} ppm
             </div>
         </div>
-        <div class="card-footer flex justify-between">
+        <div class="card-footer flex justify-between w-full">
             <button
-                v-if="!disablePreviousButton"
-                class="btn btn-primary"
+                class="btn btn-primary visibility-hidden"
+                :class="{ invisible: disablePreviousButton }"
                 @click="previousCard"
             >
                 <
             </button>
             <button
-                v-if="!disableNextButton"
-                class="btn btn-primary"
+                class="btn btn-primary visibility-hidden"
+                :class="{ invisible: disableNextButton }"
                 @click="nextCard"
             >
                 >
