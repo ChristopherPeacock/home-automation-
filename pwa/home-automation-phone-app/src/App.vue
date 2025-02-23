@@ -1,23 +1,39 @@
 <script setup>
 import ConnectDevice from "./components/ConnectDevice.vue";
 import MiddleCard from "./components/MiddleCard.vue";
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
 
 const device = ref(null);
 const deviceName = ref(null);
 const deviceInfo = ref(null);
-
 const connected = ref(false);
+
+computed(() => {
+    if (connected.value) {
+        console.log("Connected to device");
+    } else {
+        console.log("Not connected to device");
+    }
+});
+
+watch([device, deviceName, deviceInfo, connected], () => {
+    console.log("Device:", device.value);
+    console.log("Device Name:", deviceName.value);
+    console.log("Device Info:", deviceInfo.value);
+    console.log("Connected:", connected.value);
+});
 
 const findDevice = async () => {
     console.log("Finding device");
-    device.value = navigator.bluetooth
+    device.value = await navigator.bluetooth
         .requestDevice({
             filters: [{ name: "homeAutomationPico" }],
-            optionalServices: ["6E400001-B5A3-F393-E0A9-E50E24DCCA9E"],
+            optionalServices: ["00001234-0000-1000-8000-00805f9b34fb"],
         })
         .then((device) => {
             console.log("Got device:", device.name);
+            connected.value = true;
+            return device;
         })
         .catch((error) => {
             console.error("Argh! ", error);
@@ -26,10 +42,20 @@ const findDevice = async () => {
     deviceName.value = device.value.name || "No device found";
     deviceInfo.value = "Connected to: " + deviceName.value;
 };
+
+const disconnectDevice = () => {
+    console.log("Disconnecting device");
+    device.value.gatt.disconnect();
+    connected.value = false;
+};
 </script>
 
 <template>
-    <ConnectDevice @findDevice="findDevice" />
+    <ConnectDevice
+        @findDevice="findDevice"
+        :connected="connected"
+        @disconnectDevice="disconnectDevice"
+    />
     <MiddleCard />
 </template>
 

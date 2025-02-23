@@ -1,9 +1,18 @@
 <script setup>
-import { defineEmits } from "vue";
-const emit = defineEmits(["findDevice"]);
+import { defineEmits, ref, defineProps, watch } from "vue";
+
+const props = defineProps({
+    connected: Boolean,
+});
+
+const emit = defineEmits(["findDevice", "disconnectDevice"]);
 
 const findDevice = () => {
-    emit("findDevice", findDevice);
+    emit("findDevice");
+};
+
+const disconnectDevice = () => {
+    emit("disconnectDevice");
 };
 </script>
 
@@ -11,6 +20,19 @@ const findDevice = () => {
     <div
         class="absolute top-3 right-3 w-auto h-auto flex flex-col items-center justify-center"
     >
-        <button @click="findDevice" class="btn btn-wide">Connect Device</button>
+        <button
+            v-if="!props.connected"
+            @click="findDevice"
+            class="btn btn-wide"
+        >
+            Connect Device
+        </button>
+        <button
+            v-if="props.connected"
+            @click="disconnectDevice"
+            class="btn btn-wide"
+        >
+            Disconnect Device
+        </button>
     </div>
 </template>
