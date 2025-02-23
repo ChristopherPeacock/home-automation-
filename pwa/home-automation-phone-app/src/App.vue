@@ -7,6 +7,7 @@ const device = ref(null);
 const deviceName = ref(null);
 const deviceInfo = ref(null);
 const connected = ref(false);
+const server = ref(null);
 
 computed(() => {
     if (connected.value) {
@@ -30,18 +31,23 @@ const findDevice = async () => {
             filters: [{ name: "homeAutomationPico" }],
             optionalServices: ["00001234-0000-1000-8000-00805f9b34fb"],
         })
-        .then((device) => {
-            console.log("Got device:", device.name);
-            connected.value = true;
-            return device;
-        })
         .catch((error) => {
             console.error("Argh! ", error);
         });
 
-    deviceName.value = device.value.name || "No device found";
+    deviceName.value = device.value || "No device found";
     deviceInfo.value = "Connected to: " + deviceName.value;
+    connected.value = true;
 };
+
+watch(connected, () => {
+    if (connected.value) {
+        server.value = device.value.gatt.connect();
+        console.log("Connected to device payload sent");
+    } else {
+        console.log("Not connected to device");
+    }
+});
 
 const disconnectDevice = () => {
     console.log("Disconnecting device");
